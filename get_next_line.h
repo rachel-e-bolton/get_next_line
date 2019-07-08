@@ -6,7 +6,7 @@
 /*   By: rbolton <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/24 06:36:27 by rbolton           #+#    #+#             */
-/*   Updated: 2019/07/05 14:39:31 by rbolton          ###   ########.fr       */
+/*   Updated: 2019/07/08 15:55:56 by rbolton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@
 
 int				get_next_line(const int fd, char **line);
 
-typedef	struct	s_line
+typedef	struct		s_line
 {
-	char		*left_over;
-	int			fd;
-}				t_line;
+	char			*left_over;
+	int				fd;
+	struct s_line	*next;
+}					t_line;
 
 #endif
