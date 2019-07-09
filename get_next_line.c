@@ -6,7 +6,7 @@
 /*   By: rbolton <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/24 06:36:06 by rbolton           #+#    #+#             */
-/*   Updated: 2019/07/08 16:11:08 by rbolton          ###   ########.fr       */
+/*   Updated: 2019/07/09 15:06:14 by rbolton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static t_line	*create_node(char *left_over, int fd)
 	return (tmp);
 }
 
-static char	**find_excess(t_line *master, int fd)
+static t_line	*find_excess(t_line *master, int fd) 
 {
 	t_line	*current_node;
 
@@ -54,57 +54,54 @@ static char	**find_excess(t_line *master, int fd)
 	while (current_node->next != NULL)
 	{
 		if (current_node->fd == fd)
-			return (&(current_node->left_over));
+			return (current_node);
 		current_node = current_node->next;
 	}
 	if (current_node->fd == fd)
-		return (&(current_node->left_over));
+		return (current_node);
 	else 
 		return (NULL);
 }
 
-static void	store_excess(t_line *master, int fd, char *left_over)
+static void	store_excess(t_line *current_node, char *left_over)
 {
-	char	**left_over_tmp;
-	t_line	*new_node;
-	t_line	*tmp;
-
-	left_over_tmp = NULL;
-	new_node = NULL;
-	tmp = NULL;
-	if (master == NULL || fd < 0)
+	if ((current_node == NULL) || (left_over == NULL))
 		return;
-	if ((left_over_tmp = find_excess(master, fd)) == NULL)
-	{
-		if ((new_node = create_node(left_over, fd)) == NULL)
-			return;
-		tmp = master;
-		new_node->next = tmp;
-		master = new_node;
-	}
 	else
 	{
-		free(left_over_tmp);
-		*left_over_tmp = (ft_strdup((const char *)left_over));
+		free(current->left_over);
+		current_node->left_over = (ft_strdup((const char *)left_over));
 	}
+}
+
+int			perform_checks()
+{
+
 }
 
 int			get_next_line(const int fd, char **line)
 {
 	int				read_return;
 	static t_line	*master;
+	t_line			*tmp_line;
 	char			*buffer;
+	char			*tmp;
 
 	read_return = -1;
 	master = NULL;
 	buffer = NULL;
+	if ((fd == -1) || (line == NULL) || (BUFF_SIZE <= 0))
+		return (-1);
+	if (master == NULL)
+		if ((master = (t_line *)malloc(sizeof(*master))) == NULL)
+			return (-1);
 	if (fd >= 0 && line != NULL)
 		if (buffer == NULL)
 			if ((buffer = ft_strnew(BUFF_SIZE + 1)) == NULL)
 				return (-1);
-	while ((read_return = read(fd, buffer, BUFF_SIZE)) > 0)
-	{
-	}
+	read_return = read(fd, buffer, BUFF_SIZE);
+	*line = ft_strjoin
+
 	return (0);
 }
 
