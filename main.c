@@ -1,19 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rbolton <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/24 06:36:27 by rbolton           #+#    #+#             */
-/*   Updated: 2019/07/15 17:44:48 by rbolton          ###   ########.fr       */
+/*   Created: 2019/07/15 16:35:25 by rbolton           #+#    #+#             */
+/*   Updated: 2019/07/15 18:14:10 by rbolton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# define BUFF_SIZE 32
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include "get_next_line.h"
 
-int				get_next_line(const int fd, char **line);
+int     main(void)
+{
+    int     fd;
+    int     ret;
+    char    *line;
 
-#endif
+    if ((fd = open("main.c", O_RDONLY)) < 3 && fd != 0)
+        return (-1);
+    printf("%d\n", fd);
+    ret = get_next_line(fd, &line);
+    printf("%d - %s\n", ret, line);
+
+    return (0);
+}
