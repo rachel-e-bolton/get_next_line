@@ -21,10 +21,10 @@ static int	get_line(char **store, char **line, int ret)
 	if (!store || (!(new_line_char = ft_strchr(*store, '\n'))))
 		return (-1);
 	*new_line_char = '\0';
-	free(line);
+	free(*line);
 	*line = ft_strdup(*store);
 	temp = ft_strdup(new_line_char + 1);
-	free(store);
+	free(*store);
 	*store = ft_strdup(temp);
 	free(temp);
 	temp = NULL;
