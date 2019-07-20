@@ -6,14 +6,48 @@
 /*   By: rbolton <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 16:40:39 by rbolton           #+#    #+#             */
-/*   Updated: 2019/07/20 15:20:33 by rbolton          ###   ########.fr       */
+/*   Updated: 2019/07/20 15:55:27 by rbolton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include "./libft/libft.h"
 
+static int	get_index(char **store)
+{
+	int i;
+
+	i = 0;
+	while (*store[i] != '\n' && *store[i] != '\0')
+		i++;
+	return (i);
+}
+
 static int	get_line(char **store, char **line, int ret, int fd)
+{
+	int		i;
+	char	*temp;
+
+	i = get_index(store);
+	if (*store[i] == '\n')
+	{
+		*line = ft_strsub(*store, 0, i);
+		temp = ft_strdup(*store + i + 1);
+		free(*store);
+		*store = ft_strdup(temp);
+		free(temp);
+	}
+	else if (*store[i] == '\0')
+	{
+		if (ret == BUFF_SIZE)
+			get_next_line(fd, line);
+		*line = ft_strdup(*store);
+		free(*store);
+	}
+	return (1);
+}
+
+/*static int	get_line(char **store, char **line, int ret, int fd)
 {
 	char	*new_line_char;
 	char	*temp;
@@ -22,7 +56,7 @@ static int	get_line(char **store, char **line, int ret, int fd)
 		return (-1);
 	else if (!new_line_char && (temp = ft_strchr(*store, '\0')))
 	{
-		if (ret == BUFF_SIZE && fd >= 0)
+		if (ret == BUFF_SIZE)
 			get_next_line(fd, line);
 		*line = ft_strdup(*store);
 		free(*store);
@@ -37,7 +71,7 @@ static int	get_line(char **store, char **line, int ret, int fd)
 		free(temp);
 	}
 	return (1);
-}
+}*/
 
 static int	result(char **store, char **line, int ret, int fd)
 {
@@ -63,6 +97,7 @@ int			get_next_line(int fd, char **line)
 		store[fd] = ft_strnew(1);
 	while ((ret = read(fd, buffer, BUFF_SIZE)) > 0)
 	{
+		buffer[ret] = '\0';
 		temp = ft_strjoin(store[fd], buffer);
 		free(store[fd]);
 		store[fd] = ft_strdup(temp);
