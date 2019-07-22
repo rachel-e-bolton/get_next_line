@@ -6,19 +6,19 @@
 /*   By: rbolton <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/18 16:40:39 by rbolton           #+#    #+#             */
-/*   Updated: 2019/07/20 15:55:27 by rbolton          ###   ########.fr       */
+/*   Updated: 2019/07/22 16:27:50 by rbolton          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include "./libft/libft.h"
 
-static int	get_index(char **store)
+static int	get_index(char **store, int fd)
 {
 	int i;
 
 	i = 0;
-	while (*store[i] != '\n' && *store[i] != '\0')
+	while ((store[fd][i] != '\n') && (store[fd][i] != '\0'))
 		i++;
 	return (i);
 }
@@ -27,60 +27,60 @@ static int	get_line(char **store, char **line, int ret, int fd)
 {
 	int		i;
 	char	*temp;
-
-	i = get_index(store);
-	if (*store[i] == '\n')
-	{
-		*line = ft_strsub(*store, 0, i);
-		temp = ft_strdup(*store + i + 1);
-		free(*store);
-		*store = ft_strdup(temp);
-		free(temp);
-	}
-	else if (*store[i] == '\0')
-	{
-		if (ret == BUFF_SIZE)
-			get_next_line(fd, line);
-		*line = ft_strdup(*store);
-		free(*store);
-	}
-	return (1);
-}
-
-/*static int	get_line(char **store, char **line, int ret, int fd)
-{
 	char	*new_line_char;
-	char	*temp;
 
-	if (!*store || (!(new_line_char = ft_strchr(*store, '\n'))))
-		return (-1);
-	else if (!new_line_char && (temp = ft_strchr(*store, '\0')))
+	i = get_index(store, fd);
+	if (store[fd][i] == '\n')
+	{
+		new_line_char = &store[fd][i];
+		*new_line_char = '\0';
+		*line = ft_strdup(store[fd]);
+		temp = ft_strdup(new_line_char + 1);
+		ft_strdel(&store[fd]);
+		store[fd] = ft_strdup(temp);
+		ft_strdel(&temp);
+		if (store[fd][0] == '\0')
+			ft_strdel(&store[fd]);
+	}
+	else if (store[fd][i] == '\0')
 	{
 		if (ret == BUFF_SIZE)
-			get_next_line(fd, line);
-		*line = ft_strdup(*store);
-		free(*store);
-	}
-	else
-	{
-		*new_line_char = '\0';
-		*line = ft_strdup(*store);
-		temp = ft_strdup(new_line_char + 1);
-		free(*store);
-		*store = ft_strdup(temp);
-		free(temp);
+			return (get_next_line(fd, line));
+		*line = ft_strdup(store[fd]);
+		ft_strdel(&store[fd]);
 	}
 	return (1);
-}*/
-
-static int	result(char **store, char **line, int ret, int fd)
-{
-	if (ret < 0)
-		return (-1);
-	else if (ret == 0 && (*store == '\0' || !*store))
-		return (0);
-	return (get_line(store, line, ret, fd));
 }
+
+/*
+**static int	get_line(char **store, char **line, int ret, int fd)
+**{
+**	char	*new_line_char;
+**	char	*temp;
+**
+**	new_line_char = ft_strchr(*store, '\n');
+**	temp = ft_strchr(*store, '\0');
+**	if (!*store || (!new_line_char && !temp))
+**		return (-1);
+**	if (!new_line_char && temp)
+**	{
+**		if (ret == BUFF_SIZE)
+**			get_next_line(fd, line);
+**		*line = ft_strdup(*store);
+**		free(*store);
+**	}
+**	else
+**	{
+**		*new_line_char = '\0';
+**		*line = ft_strdup(*store);
+**		temp = ft_strdup(new_line_char + 1);
+**		free(*store);
+**		*store = ft_strdup(temp);
+**		free(temp);
+**	}
+**	return (1);
+**}
+*/
 
 int			get_next_line(int fd, char **line)
 {
@@ -89,10 +89,9 @@ int			get_next_line(int fd, char **line)
 	char		*temp;
 	int			ret;
 
-	if (fd < 0 || fd > FD_MAX || BUFF_SIZE < 1 || !line)
+	if (fd < 0 || fd > FD_MAX || BUFF_SIZE < 1 || !line || read(fd, buffer, 0))
 		return (-1);
 	store[FD_MAX] = NULL;
-	ft_memset(buffer, '\0', (BUFF_SIZE + 1));
 	if (!store[fd])
 		store[fd] = ft_strnew(1);
 	while ((ret = read(fd, buffer, BUFF_SIZE)) > 0)
@@ -105,5 +104,9 @@ int			get_next_line(int fd, char **line)
 		if (ft_strchr(buffer, '\n'))
 			break ;
 	}
-	return (result(&store[fd], line, ret, fd));
+	if (ret < 0)
+		return (-1);
+	else if ((ret == 0 && store[fd] == NULL) || store[fd][0] == '\0')
+		return (0);
+	return (get_line(store, line, ret, fd));
 }
